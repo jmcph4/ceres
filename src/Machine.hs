@@ -27,6 +27,12 @@ type Code = [Instruction]
 
 type Program = Code
 
+maximumStackDepth :: Int 
+maximumStackDepth = 1024
+
+memorySize :: Int
+memorySize = 1024
+
 op2 :: (Word -> Word -> Word) -> Stack -> Stack
 op2 f (a : b : xs) = [f a b] ++ xs
 op2 f _            = error "Expected two arguments, received one"
@@ -55,7 +61,7 @@ jump :: State -> Word -> State
 jump s dest = s { pc = dest }
 
 push :: State -> State
-push s = if (length (stack s)) == 1024
+push s = if (length (stack s)) == maximumStackDepth 
     then error "Stack full"
     else s { pc = (pc s) + 1, stack = [reg s] ++ stack s }
 
@@ -135,7 +141,7 @@ run ss prog = case step ss (prog !! fromIntegral (pc ss)) of
     Just ss' -> run ss' prog
 
 startState :: State
-startState = State 0 0 [] (replicate 16 0)
+startState = State 0 0 [] (replicate memorySize 0)
 
 runMachine :: Program -> State
 runMachine prog = run startState prog
